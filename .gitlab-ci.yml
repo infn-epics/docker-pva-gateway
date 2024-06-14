@@ -1,0 +1,28 @@
+services:
+  - docker:19.03.12-dind
+
+stages:
+    - build
+
+build_image:
+#  tags:
+#    - lnf
+  stage: build
+  image: docker:19.03.12
+  variables:
+   
+    DOCKER_TLS_CERTDIR: ""
+    LAST_TAG: $CI_COMMIT_REF_NAME
+    LATEST_TAG: "latest"
+  
+  before_script:
+    - apk add --no-cache git
+
+    
+  script:
+    - LAST_TAG=$(git describe --tags --abbrev=0)
+    - docker login baltig.infn.it:4567 -u gitlab+deploy-token-49 -p ${DOCKER_IO_KEY}
+    - docker build --build-arg TARGET_ARCHITECTURE=linux -t baltig.infn.it:4567/epics-containers/docker-pva-gateway:$LAST_TAG .
+    - docker tag baltig.infn.it:4567/epics-containers/docker-pva-gateway:$LAST_TAG baltig.infn.it:4567/epics-containers/docker-pva-gateway:$LATEST_TAG
+    - docker push baltig.infn.it:4567/epics-containers/docker-pva-gateway:$LAST_TAG
+    - docker push baltig.infn.it:4567/epics-containers/docker-pva-gateway:$LATEST_TAG
