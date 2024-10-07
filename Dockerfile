@@ -9,5 +9,5 @@ ARG GROUP_UID=1000
 
 RUN chown -R ${USER_UID}:${GROUP_UID} /epics
 USER ${USER_ID}
-CMD ["python", "-m", "p4p.gw"]
+CMD ["python", "-m", "nose2","p4p"]
 
