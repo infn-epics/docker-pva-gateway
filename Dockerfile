@@ -12,12 +12,8 @@ LABEL org.opencontainers.image.title="EPICS PVAccess Gateway"
 LABEL org.opencontainers.image.description="PVAccess gateway powered by p4p"
 LABEL org.opencontainers.image.source="https://github.com/infn-epics/docker-pva-gateway"
 
-# Copy compiled packages and CLI tools from the builder
+# Copy compiled packages from the builder
 COPY --from=builder /usr/local/lib/python3.12/site-packages/ /usr/local/lib/python3.12/site-packages/
-COPY --from=builder /usr/local/bin/pvget /usr/local/bin/pvget
-COPY --from=builder /usr/local/bin/pvput /usr/local/bin/pvput
-COPY --from=builder /usr/local/bin/pvinfo /usr/local/bin/pvinfo
-COPY --from=builder /usr/local/bin/pvmonitor /usr/local/bin/pvmonitor
 
 ARG USER_UID=1000
 ARG GROUP_UID=1000
