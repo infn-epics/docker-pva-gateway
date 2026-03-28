@@ -4,8 +4,13 @@ LABEL org.opencontainers.image.title="EPICS PVAccess Gateway"
 LABEL org.opencontainers.image.description="PVAccess gateway powered by p4p"
 LABEL org.opencontainers.image.source="https://github.com/infn-epics/docker-pva-gateway"
 
-# p4p ships pre-built wheels for amd64 and arm64 — no compiler needed
-RUN pip install --no-cache-dir p4p
+# epicscorelibs (p4p transitive dep) needs gcc on arm64 — install, build, then purge
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc python3-dev && \
+    pip install --no-cache-dir p4p && \
+    apt-get purge -y gcc python3-dev && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
 
 ARG USER_UID=1000
 ARG GROUP_UID=1000
