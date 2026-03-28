@@ -1,13 +1,24 @@
-FROM baltig.infn.it:4567/epics-containers/epics-py-base AS base
-USER root
-RUN pip install --upgrade p4p nose2
-ARG USER_ID=epics
+FROM python:3.12-slim
+
+LABEL org.opencontainers.image.title="EPICS PVAccess Gateway"
+LABEL org.opencontainers.image.description="PVAccess gateway powered by p4p"
+LABEL org.opencontainers.image.source="https://github.com/infn-epics/docker-pva-gateway"
+
+# p4p ships pre-built wheels for amd64 and arm64 — no compiler needed
+RUN pip install --no-cache-dir p4p
+
 ARG USER_UID=1000
-ARG GROUP_ID=control
 ARG GROUP_UID=1000
 
+RUN groupadd -r epics -g "${GROUP_UID}" && \
+    useradd -r -u "${USER_UID}" -g epics -d /epics -s /bin/sh epics
 
-RUN chown -R ${USER_UID}:${GROUP_UID} /epics
-USER ${USER_ID}
-CMD ["python", "-m", "nose2","p4p"]
+WORKDIR /epics
+
+COPY start.sh /epics/start.sh
+RUN chmod +x /epics/start.sh && chown -R epics:epics /epics
+
+USER epics
+
+ENTRYPOINT ["/epics/start.sh"]
 
